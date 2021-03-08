@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE 700
+#define MAX_PROC 4
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,13 +20,41 @@ extern int errno;
 int producers = 2; // Default
 int consumers = 6; // Deafult
 int time = 100; // Default
+int test_value = 100;
+int shmid;
+int *shmptr;
+char *log_name = "logfile"; // Default
 
 void timer_func(){
 	printf("Time ran out, exiting...\n");
 	exit(0);
 }
 
+void kill_func(){
+	shmdt(shmptr);
+	shmctl(shmid, IPC_RMID, NULL);
+}
+
+void help_menu(){
+	printf("Help menu goes here\n");
+	exit(0);
+}
+
+int add(int a, int b){
+	return a + b;
+}
+
+void create_file(char *name){
+	FILE *fp;
+	char buf[50];
+	strcpy(buf, name);
+	strcat(buf, ".txt");
+	fp = fopen(buf, "w");
+	fclose(fp);
+}
+	
 int main(int argc, char* argv[]){
+
 	int opt;
 	char *opt_buf;	
 
@@ -58,10 +87,12 @@ int main(int argc, char* argv[]){
 		switch(opt)
 		{
 			case 'h':
-				printf("help menu here\n");
+				help_menu();
 				break;
 			case 'o':
-				printf("name of logfile here\n");
+				opt_buf = optarg;
+				log_name = opt_buf;
+				create_file(log_name);
 				break;
 			case 'p':
 				opt_buf = optarg;
@@ -85,6 +116,46 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
-	sleep(20);
+	
+//*****************************************************************************************************
+//
+//	Generating Shared Memory
+//
+//*****************************************************************************************************
+
+
+	key_t key = ftok("./README.md", 'a');
+	shmid = shmget(key,  sizeof(int) * MAX_PROC, IPC_CREAT | 0666);
+
+	if (shmid < 0)
+	{
+		errno = 5;
+		perror("monitor: Error: Could not create shared memory");
+		exit(0);
+	}
+
+	shmptr = (int *)shmat(shmid, 0, 0);
+
+	if (shmptr == (int *) -1)
+	{
+		errno = 5;
+		perror("monitor: Error: Could not attach shared memory");
+		exit(0);
+	}
+
+	shmptr[0] = 1;
+	
+	printf("Forking now\n");
+	int pid = fork();
+	char *args[] = {"./consumer", NULL};
+	if (pid == 0)
+	{
+		printf("In monitor child\n");
+		int consume_pid = fork();
+		if (consume_pid == 0)
+			execvp(args[0], args);
+	}
+	printf("Out of for\n");
+	kill_func();
 	return 0;
 }

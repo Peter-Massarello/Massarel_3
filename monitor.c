@@ -40,10 +40,6 @@ void help_menu(){
 	exit(0);
 }
 
-int add(int a, int b){
-	return a + b;
-}
-
 void create_file(char *name){
 	FILE *fp;
 	char buf[50];

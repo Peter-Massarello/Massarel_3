@@ -1,19 +1,31 @@
 CC = gcc
-CFLAGS = -std=c99 -g
+CFLAGS = -std=c99
 
 all: monitor consumer producer
 
-%.o: %.c
-	$(CC) $(CFLAGS) -I . -c $< -o $@
+monitor: monitor.o lib_monitor.a
+	$(CC) -L. -o $@ monitor.o -l_monitor $(CFLAGS)
 
-monitor: monitor.o
-	$(CC) $(CFLAGS) $< -o $@ -lm
+consumer: consumer.o lib_monitor.a
+	$(CC) -L. -o $@ consumer.o -l_monitor $(CFLAGS)
 
-consumer: consumer.o
-	$(CC) $(CFLAGS) $< -o $@ 
+producer: producer.o lib_monitor.a
+	$(CC) -L. -o $@ producer.o -l_monitor $(CFLAGS)
 
-producer: producer.o
-	$(CC) $(CFLAGS) $< -o $@
+lib_monitor.o: lib_monitor.c
+	$(CC) -c -O $^
+
+consumer.o: consumer.c
+	$(CC) -c -O $^
+
+producer.o: producer.c
+	$(CC) -c -O $^
+
+monitor.o: monitor.c
+	$(CC) -c -O $^
+
+lib_monitor.a: lib_monitor.o
+	ar rcs $@ $^
 
 clean:
-	rm -f *.o *.txt monitor consumer producer
+	rm -f *.o *.a *.txt monitor consumer producer

@@ -10,6 +10,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
+#include <sys/sem.h>
+#include "lib_monitor.h"
 
 
 int main(int argc, char* argv[]){

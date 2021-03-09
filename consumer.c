@@ -10,10 +10,17 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
-#include "monitor.h"
+#include <sys/sem.h>
+#include "lib_monitor.h"
+
+void kill_func(){
+	exit(0);
+}
 
 int main(int argc, char* argv[]){
 
-	printf("Here from consumer!\n");
+	signal(SIGKILL, kill_func);
+
+	printf("Here from consumer\n");
 	return 0;
 }

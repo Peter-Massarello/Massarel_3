@@ -11,16 +11,25 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/sem.h>
+#include <time.h>
 #include "lib_monitor.h"
 
-void kill_func(){
+int sem_id, sleep_count;
+
+void kill_func() {
 	exit(0);
 }
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[]) {
+	srand(time(NULL));
 
 	signal(SIGKILL, kill_func);
 
-	printf("Here from consumer\n");
+	while (1)
+	{
+		consume();
+		sleep_count = (rand() % 11) + 1; // 1-11
+		sleep(sleep_count);
+	}
 	return 0;
 }

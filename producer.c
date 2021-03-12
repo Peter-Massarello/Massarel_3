@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/ipc.h>
@@ -13,10 +14,22 @@
 #include <sys/sem.h>
 #include "lib_monitor.h"
 
+int sem_id, sleep_count;
+
+void kill_func() {
+	exit(0);
+}
 
 int main(int argc, char* argv[]){
+	srand(time(NULL));
 
-	printf("Here from producer!\n");
+	signal(SIGKILL, kill_func);
 
+	while (1) 
+	{
+		produce();
+		sleep_count = (rand() % 6) + 1; // 1-6
+		sleep(sleep_count);
+	}
 	return 0;
 }

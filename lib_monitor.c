@@ -11,6 +11,7 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/sem.h>
+#include <time.h>
 #include "lib_monitor.h"
 
 
@@ -18,7 +19,9 @@ key_t buf_key;
 int buf_id;
 int *buf_ptr;
 
-void append(int x){
+void produce(){
+	srand(time(NULL));
+
 	buf_key = ftok("./README.md", 'a');
 	buf_id = shmget(buf_key, sizeof(int) * SIZE, IPC_EXCL);
 
@@ -40,6 +43,8 @@ void append(int x){
 }
 
 void consume(){
+	srand(time(NULL));
+
 	buf_key = ftok("./README.md", 'a');
 	buf_id = shmget(buf_key, sizeof(int) * SIZE, IPC_EXCL);
 
@@ -58,5 +63,15 @@ void consume(){
 		perror("consumer: Error: Shared memory could not be attached");
 		exit(0);
 	}
+
+}
+
+void sem_wait(int sem) {
+
+
+}
+
+void sem_signal(int sem) {
+
 
 }

@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <math.h>
 #include <signal.h>
+#include <time.h>
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -19,7 +20,7 @@ extern int errno;
 
 int producers = 2; // Default
 int consumers = 6; // Deafult
-int time = 100; // Default
+int alarm_time = 100; // Default
 int test_value = 100;
 int shmid;
 int *shmptr;
@@ -77,7 +78,7 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	system("clear");
+	//system("clear");
 	while((opt = getopt(argc, argv, "ho:p:c:t:")) != -1)
 	{
 		switch(opt)
@@ -86,9 +87,18 @@ int main(int argc, char* argv[]){
 				help_menu();
 				break;
 			case 'o':
-				opt_buf = optarg;
-				log_name = opt_buf;
-				create_file(log_name);
+				if (strlen(optarg) > 20)
+				{
+					printf("Input given too long, defaulting to logfile.txt");
+					create_file(log_name);
+				}
+				else
+				{
+					opt_buf = optarg;
+					log_name = opt_buf;
+					create_file(log_name);
+				}
+				printf("%s", log_name);
 				break;
 			case 'p':
 				opt_buf = optarg;
@@ -102,9 +112,9 @@ int main(int argc, char* argv[]){
 				break;
 			case 't':
 				opt_buf = optarg;
-				time = atoi(opt_buf);
-				printf("time given %d\n", time);
-				alarm(time);
+				alarm_time = atoi(opt_buf);
+				printf("time given %d\n", alarm_time);
+				alarm(alarm_time);
 				break;
 			default:
 				errno = 1;
@@ -118,7 +128,6 @@ int main(int argc, char* argv[]){
 //	Generating Shared Memory
 //
 //*****************************************************************************************************
-
 
 	key_t key = ftok("./README.md", 'a');
 	shmid = shmget(key,  sizeof(int) * MAX_PROC, IPC_CREAT | 0666);

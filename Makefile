@@ -22,7 +22,7 @@ producer.o: producer.c
 	$(CC) -c -O $^
 
 monitor.o: monitor.c
-	$(CC) -c -O $^
+	$(CC) -c -O $^ $(CFLAGS)
 
 lib_monitor.a: lib_monitor.o
 	ar rcs $@ $^

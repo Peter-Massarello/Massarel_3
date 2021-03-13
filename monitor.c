@@ -46,16 +46,16 @@ void kill_mem(){
 	shmctl(shmid, IPC_RMID, NULL);
 	shmctl(log_id, IPC_RMID, NULL);
 	semctl(sem_id, 0, IPC_RMID, NULL);
-
-	kill_child();
-}
-
-void signal_handler(){
-	kill_mem();
 }
 
 void end_func(){
-	signal_handler();
+	kill_child();
+	kill_mem();
+	free(pid_list);
+}
+
+void signal_handler(){
+	end_func();
 }
 
 void help_menu(){
@@ -82,8 +82,34 @@ void help_menu(){
 void create_file(char *name){
 	FILE *fp;
 	char buf[50];
+
+// Put Log File shared memory declaration inside creation function for ease of use
+
+	key_t log_key = ftok(".", 'a');
+	log_id = shmget(log_key, sizeof(char) * 50, IPC_CREAT | 0666);
+
+	if (log_id < 0)
+	{
+		errno = 5;
+		perror("monitor: Error: Could not create shared memory for file");
+		end_func();
+		exit(0);
+	}
+	
+	log_ptr = (char *)shmat(log_id, 0, 0);
+
+	if (log_ptr == (char *) -1)
+	{
+		errno = 5;
+		perror("monitor: Error: Could not attach shared memory to file");
+		end_func();
+		exit(0);
+	}
+
 	strcpy(buf, name);
 	strcat(buf, ".txt");
+	strcpy(log_ptr, buf);
+
 	fp = fopen(buf, "w");
 	fclose(fp);
 }
@@ -94,6 +120,7 @@ void init_sems(){
 	semctl(sem_id, IN_BUF, SETVAL, 0);
 	semctl(sem_id, CON_WAIT, SETVAL, consumers);
 	semctl(sem_id, FREE_PROC, SETVAL, 19);
+	semctl(sem_id, RUN_CON, SETVAL, consumers);
 }
 	
 void remove_child(pid_t  pid){
@@ -133,7 +160,8 @@ void init_pids(){
 int main(int argc, char* argv[]){
 
 	int opt;
-	char *opt_buf;	
+	char *opt_buf;
+	bool file_given = false;
 
 
 //*****************************************************************************************************
@@ -141,7 +169,7 @@ int main(int argc, char* argv[]){
 //	Signal Creation
 //	
 //*****************************************************************************************************
-
+	signal(SIGINT, signal_handler);
 	signal(SIGALRM, signal_handler);
 	signal(SIGKILL, signal_handler);
 	
@@ -184,6 +212,7 @@ int main(int argc, char* argv[]){
 					log_name = opt_buf;
 					create_file(log_name);
 				}
+				file_given = true;
 				break;
 			case 'p':
 				opt_buf = optarg;
@@ -207,6 +236,22 @@ int main(int argc, char* argv[]){
 				break;
 		}
 	}
+
+//*****************************************************************************************************
+//
+//	Checks to make sure consumers are higher than producers
+//
+//*****************************************************************************************************
+
+
+	if (consumers < producers)
+	{
+		printf("Values given for producer and consumer do not follow program specifications\n");
+		printf("Will reset back to default of 2 producers and 6 consumers\n");
+		consumers = 6;
+		producers = 2;
+	}
+
 	
 //*****************************************************************************************************
 //
@@ -215,16 +260,21 @@ int main(int argc, char* argv[]){
 //*****************************************************************************************************
  	printf("Out of getopt\n");
 
+	if (!file_given)
+	{
+		create_file(log_name);	
+	}
+
 	pid_list = malloc(sizeof(pid_t) * 19);
 	init_pids();
 
 	key_t key = ftok("./README.md", 'a');
-	shmid = shmget(key,  sizeof(int) * MAX_PROC, IPC_CREAT | 0666);
+	shmid = shmget(key,  sizeof(int) * 6, IPC_CREAT | 0666);
 
 	if (shmid < 0)
 	{
 		errno = 5;
-		perror("monitor: Error: Could not create shared memory");
+		perror("monitor: Error: Could not create shared memory to buffer");
 		end_func();
 		exit(0);
 	}
@@ -234,7 +284,7 @@ int main(int argc, char* argv[]){
 	if (shmptr == (int *) -1)
 	{
 		errno = 5;
-		perror("monitor: Error: Could not attach shared memory");
+		perror("monitor: Error: Could not attach shared memory to buffer");
 		end_func();
 		exit(0);
 	}
@@ -250,28 +300,7 @@ int main(int argc, char* argv[]){
 	if (sem_id < 0)
 	{
 		errno = 5;
-		perror("monitor: Error: Could not create shared memory");
-		end_func();
-		exit(0);
-	}
-
-	key_t log_key = ftok(".", 'a');
-	log_id = shmget(log_key, sizeof(char) * 50, IPC_CREAT | 0666);
-
-	if (log_id < 0)
-	{
-		errno = 5;
-		perror("monitor: Error: Could not create shared memory");
-		end_func();
-		exit(0);
-	}
-	
-	log_ptr = (char *)shmat(log_id, 0, 0);
-
-	if (log_ptr == (char *) -1)
-	{
-		errno = 5;
-		perror("monitor: Error: Could not attach shared memory");
+		perror("monitor: Error: Could not create shared memory for semaphores");
 		end_func();
 		exit(0);
 	}
@@ -303,7 +332,15 @@ int main(int argc, char* argv[]){
 	while(1)
 	{
 		if (semctl(sem_id, RUN_CON, GETVAL, NULL) == 0)
+		{
+			FILE *fp;
+			fp = fopen(log_ptr, "a");
+
+			fprintf(fp, "All consumers have eaten, program will now exit\n");
+			fclose(fp);
 			break;
+		}
+
 	}
 
 	end_func();

@@ -23,7 +23,7 @@ void kill_func() {
 int main(int argc, char* argv[]) {
 	srand(time(NULL));
 
-	signal(SIGKILL, kill_func);
+	signal(SIGINT, kill_func);
 
 	while (1)
 	{

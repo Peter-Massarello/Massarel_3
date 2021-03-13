@@ -1,5 +1,5 @@
 #define SIZE 4
-#define NUM_SEMS 6
+#define NUM_SEMS 7
 #define MUTEX 0
 #define FREE_SPACE 1
 #define IN_BUF 2

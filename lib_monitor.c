@@ -1,5 +1,5 @@
 #define SIZE 4
-#define NUM_SEMS 6
+#define NUM_SEMS 7
 #define MUTEX 0
 #define FREE_SPACE 1
 #define IN_BUF 2
@@ -30,6 +30,10 @@ key_t buf_key, sem_key,log_key;
 int buf_id, sem_id, log_id;
 int *buf_ptr;
 char *log_ptr;
+
+time_t time_start, time_end;
+
+FILE *fp;
 
 struct sembuf op;
 
@@ -95,7 +99,33 @@ void produce(){
 
 	printf("Produced %d\n", p);
 
+	struct tm * time_start_info;
+	struct tm * time_end_info;
+
+	// Opens file
+	fp = fopen(log_ptr, "a");
+
+	// Begin timer for critical section
+	time(&time_start);
+	time_start_info = localtime(&time_start);
+
+	fprintf(fp, "Producing %d into buffer at time: %s\n", p, asctime(time_start_info));
+
+	buf_ptr[buf_ptr[NEXT_IN]] = p;
+
+	// Bounded Buffer
+	buf_ptr[NEXT_IN] = (buf_ptr[NEXT_IN] + 1) % 4;
+
 	sleep(1);
+
+	// End timer of critical section
+	time(&time_end);
+	time_end_info = localtime(&time_end);
+
+	fprintf(fp, "Leaving produce function, time: %s\n\n", asctime(time_end_info));
+
+	// Close file
+	fclose(fp);
 
 	ending_func();
 	
@@ -154,7 +184,36 @@ void consume(){
 		exit(0);
 	}
 
-	printf("Consuming\n");
+	int food = buf_ptr[buf_ptr[NEXT_OUT]];
+
+	// Bounded Buffer
+	buf_ptr[NEXT_OUT] = (buf_ptr[NEXT_OUT] + 1) % 4;
+
+	struct tm * time_start_info;
+	struct tm * time_end_info;
+
+	// Opens file
+	fp = fopen(log_ptr, "a");
+
+	// Begin timer for critical section
+	time(&time_start);
+	time_start_info = localtime(&time_start);
+
+	printf("Consuming %d\n", food);
+
+	fprintf(fp, "Consuming %d from buffer at time: %s\n", food, asctime(time_start_info));
+
+
+	sleep(1);
+
+	// End timer of critical section
+	time(&time_end);
+	time_end_info = localtime(&time_end);
+
+	fprintf(fp, "Leaving consume function, time: %s\n\n", asctime(time_end_info));
+
+	// Close file
+	fclose(fp);
 
 	ending_func();
 

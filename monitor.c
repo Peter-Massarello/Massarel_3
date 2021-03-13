@@ -59,7 +59,23 @@ void end_func(){
 }
 
 void help_menu(){
-	printf("Help menu goes here\n");
+	printf("HELP MENU\n\n");
+	printf("Program wil take in four arguments, filename, consumers, producers and time\n");
+	printf("Defaults are logfile.txt, 2 producers, 6 consumers, and 100 seconds\n");
+	printf("PROGRAM OPTIONS:\n\n");
+	printf("OPTION [-o]:\n");
+	printf("           When called, will overwrite the default logfile with given logfile name\n");
+	printf("           If given filename is longer than 20, will default to logfile.txt\n");
+	printf("           EX: ./montior -o newfilename\n\n");
+	printf("OPTION [-c]:\n");
+	printf("           When called, will overwrite the default value of consumers with given value\n");
+	printf("           EX: ./montior -c 20\n\n");
+	printf("OPTION [-p]:\n");
+	printf("           When called, will overwrite the default value of producers with given value\n");
+	printf("           EX: ./monitor -p 20\n\n");
+	printf("OPTION [-t]:\n");
+	printf("           When called, will overwtie the default value of time with given value\n");
+	printf("           EX: ./monitor -t 20\n\n");
 	exit(0);
 }
 
@@ -148,7 +164,7 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	//system("clear");
+	system("clear");
 	while((opt = getopt(argc, argv, "ho:p:c:t:")) != -1)
 	{
 		switch(opt)

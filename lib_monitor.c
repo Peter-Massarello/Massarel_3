@@ -43,13 +43,14 @@ void ending_func(){
 }
 
 void produce(){
-	srand(time(NULL));
 	signal(SIGINT, ending_func);
 
 	sem_wait(CON_WAIT);
 	sem_signal(PROD_WORK);
 	sem_wait(FREE_SPACE);
 	sem_wait(MUTEX);
+
+	srand(time(NULL));
 
 	buf_key = ftok("./README.md", 'a');
 	buf_id = shmget(buf_key, sizeof(int) * SIZE, IPC_EXCL);

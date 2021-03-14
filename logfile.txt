@@ -1,0 +1,62 @@
+Producing 56 into buffer at time: Sat Mar 13 21:03:31 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:32 2021
+
+
+Producing 39 into buffer at time: Sat Mar 13 21:03:32 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:33 2021
+
+
+Consuming 56 from buffer at time: Sat Mar 13 21:03:33 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:34 2021
+
+
+Producing 71 into buffer at time: Sat Mar 13 21:03:34 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:35 2021
+
+
+Consuming 39 from buffer at time: Sat Mar 13 21:03:35 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:36 2021
+
+
+Consuming 71 from buffer at time: Sat Mar 13 21:03:36 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:37 2021
+
+
+Producing 57 into buffer at time: Sat Mar 13 21:03:37 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:38 2021
+
+
+Consuming 57 from buffer at time: Sat Mar 13 21:03:38 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:39 2021
+
+
+Producing 47 into buffer at time: Sat Mar 13 21:03:39 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:40 2021
+
+
+Consuming 47 from buffer at time: Sat Mar 13 21:03:40 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:41 2021
+
+
+Producing 41 into buffer at time: Sat Mar 13 21:03:41 2021
+
+Leaving produce function, time: Sat Mar 13 21:03:42 2021
+
+
+Consuming 41 from buffer at time: Sat Mar 13 21:03:42 2021
+
+Leaving consume function, time: Sat Mar 13 21:03:43 2021
+
+
+All consumers have eaten, program will now exit at time: Sat Mar 13 21:03:43 2021
+

@@ -120,7 +120,7 @@ void init_sems(){
 	semctl(sem_id, IN_BUF, SETVAL, 0);
 	semctl(sem_id, CON_WAIT, SETVAL, consumers);
 	semctl(sem_id, FREE_PROC, SETVAL, 19);
-	semctl(sem_id, RUN_CON, SETVAL, consumers);
+	semctl(sem_id, CUR_CON, SETVAL, consumers);
 }
 	
 void remove_child(pid_t  pid){
@@ -258,7 +258,6 @@ int main(int argc, char* argv[]){
 //	Generating Shared Memory
 //
 //*****************************************************************************************************
- 	printf("Out of getopt\n");
 
 	if (!file_given)
 	{
@@ -305,7 +304,6 @@ int main(int argc, char* argv[]){
 		exit(0);
 	}
 
-	printf("Forking now\n");
 
 	int empty, i;
 	
@@ -331,12 +329,19 @@ int main(int argc, char* argv[]){
 
 	while(1)
 	{
-		if (semctl(sem_id, RUN_CON, GETVAL, NULL) == 0)
+		//printf("%d\n", semctl(sem_id, CUR_CON, GETVAL, NULL));
+		if (semctl(sem_id, CUR_CON, GETVAL, NULL) == 0)
 		{
 			FILE *fp;
+			time_t time_start;
+			struct tm * time_start_info;
+			
+			time(&time_start);
+			time_start_info = localtime(&time_start);
+
 			fp = fopen(log_ptr, "a");
 
-			fprintf(fp, "All consumers have eaten, program will now exit\n");
+			fprintf(fp, "All consumers have eaten, program will now exit at time: %s\n", asctime(time_start_info));
 			fclose(fp);
 			break;
 		}

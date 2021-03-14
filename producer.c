@@ -28,9 +28,9 @@ int main(int argc, char* argv[]){
 
 	while (1) 
 	{
-		produce();
 		sleep_count = (rand() % 6) + 1; // 1-6
 		sleep(sleep_count);
+		produce();
 	}
 	return 0;
 }

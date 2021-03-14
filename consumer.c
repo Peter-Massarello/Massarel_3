@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 	while (1)
 	{
 		consume();
-		sleep_count = (rand() % 11) + 1; // 1-11
+		sleep_count = (rand() % 11) + 1; // 1-10
 		sleep(sleep_count);
 	}
 	return 0;

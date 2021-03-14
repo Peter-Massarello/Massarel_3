@@ -12,10 +12,8 @@ implimenting them with the concept of a monitor in C.
 # BUGS AND NOTES
 -------------------------------------------------------------------------------
 
-- The main bug I found was that the program never fully quits by itself. Even
-after all the consumers have consumed and died, the program just halts. I will
-try and fix this but as of right now, once the consumers are all dead, you have
-to use the ctrl C function to quit.
+- Any number above 18 given for either producer or consumer will not let the
+program exit properly and you have to rely on ctrl-c.
 
 - I used a source to help with the semaphore creation, code from there is pretty
 much replicated in my source code.
